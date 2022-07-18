@@ -8,45 +8,27 @@
  * @format
  */
 
-import axios from 'axios';
-import React, {useEffect} from 'react';
-import {
-  ActivityIndicator,
-  Alert,
-  Button,
-  SafeAreaView,
-  Text,
-  ToastAndroid,
-  View,
-} from 'react-native';
-import {QueryClient, QueryClientProvider, useQuery} from 'react-query';
-import {QuotesModel} from './QuotesModel';
+import React, {useEffect, useState} from 'react';
+import {Button, SafeAreaView, Text} from 'react-native';
+import {QueryClient, QueryClientProvider} from 'react-query';
+import {getRandomQuotes} from './src/services';
 
 const Main = () => {
-  const getQuotes = async () => {
-    const {data} = await axios.get('https://animechan.vercel.app/api/quotes');
+  const [quote, setQuote] = useState('empty quotes');
 
-    return data;
-  };
+  const testApiCall2 = async () => {
+    const data = await getRandomQuotes();
 
-  const {
-    data = [],
-    isError,
-    isFetching,
-    refetch,
-    error,
-  } = useQuery('getQuotes', getQuotes, {manual: true});
+    console.log('data', data);
+    console.log('data.response', data.response);
 
-  useEffect(() => {
-    if (error) {
-      ToastAndroid.show('errr gan', ToastAndroid.SHORT);
+    if (data.response.length > 0) {
+      console.log('data.response[0].quote', data.response[0].quote);
+      setQuote(data.response[0].quote);
     }
-  }, [error]);
-
-  const onClick = () => {
-    console.log('refetch');
-    refetch();
   };
+  useEffect(() => {}, []);
+
   return (
     <SafeAreaView
       style={{
@@ -54,9 +36,8 @@ const Main = () => {
         flex: 1,
         alignItems: 'center',
       }}>
-      {isFetching && <ActivityIndicator />}
-      <Button title="Refetch" onPress={onClick} />
-      <Text>{data[0]?.quote}</Text>
+      <Button title="Refetch" onPress={testApiCall2} />
+      <Text>{quote}</Text>
     </SafeAreaView>
   );
 };
